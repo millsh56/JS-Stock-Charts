@@ -1012,3 +1012,4 @@ const mockData = {
         "status": "ok"
     }
 }
+export default mockData

@@ -1,6 +1,7 @@
 {
   "name": "5.7.5-activity",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,6 +10,7 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "chart.js": "^4.4.1",
     "live-server": "^1.2.1"
   }
 }
