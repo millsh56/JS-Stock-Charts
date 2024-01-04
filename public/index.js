@@ -45,6 +45,7 @@ async function main() {
   }
   const highestHighsArray = getHighest(mockData);
   console.log(highestHighsArray);
+  
 
   let GME = mockData.GME;
   let MSFT = mockData.MSFT;
@@ -67,7 +68,6 @@ async function main() {
     },
   });
 
-
   new Chart(highestPriceChartCanvas.getContext("2d"), {
     type: "bar",
     data: {
@@ -80,26 +80,109 @@ async function main() {
             "rgba(61, 161, 61, 0.7)",
             "rgba(209, 4, 25, 0.7)",
             "rgba(18, 4, 209, 0.7)",
-            "rgba(166, 43, 158, 0.7)"
+            "rgba(166, 43, 158, 0.7)",
           ],
           borderColor: [
             "rgba(61, 161, 61, 0.7)",
             "rgba(209, 4, 25, 0.7)",
             "rgba(18, 4, 209, 0.7)",
-            "rgba(166, 43, 158, 0.7)"
+            "rgba(166, 43, 158, 0.7)",
           ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
+          borderWidth: 1,
         },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
     },
   });
 }
+
+
+function calculateAverageStockPrice(mockData) {
+    const stocks = Object.keys(mockData);
+    const averagePrices = [];
+  
+    stocks.forEach(stock => {
+      const values = mockData[stock].values;
+      let sum = 0;
+      let count = 0;
+  
+      values.forEach(value => {
+        for (const key in value) {
+          if (key !== 'datetime' && !isNaN(value[key])) {
+            sum += parseFloat(value[key]);
+            count++;
+          }
+        }
+      });
+  
+      const stockAverage = count !== 0 ? sum / count : 0;
+      averagePrices.push(stockAverage);
+    });
+  
+    // Calculate overall average
+    let overallSum = 0;
+    let overallCount = 0;
+  
+    stocks.forEach(stock => {
+      const values = mockData[stock].values;
+      values.forEach(value => {
+        for (const key in value) {
+          if (key !== 'datetime' && !isNaN(value[key])) {
+            overallSum += parseFloat(value[key]);
+            overallCount++;
+          }
+        }
+      });
+    });
+  
+    const overallAverage = overallCount !== 0 ? overallSum / overallCount : 0;
+    averagePrices.push(overallAverage);
+  
+    return averagePrices;
+  }
+
+  const averageStockPrices = calculateAverageStockPrice(mockData);
+console.log(averageStockPrices);
+
+const labelsWithOverall = Object.keys(mockData).concat('Overall');
+
+
+new Chart(averagePriceChartCanvas.getContext("2d"), {
+type: 'pie',
+data: {
+    labels: labelsWithOverall, 
+    datasets: [{
+      label: 'Average Stock Prices',
+      data: averageStockPrices,
+      backgroundColor: [
+        "rgba(61, 161, 61, 0.7)",
+        "rgba(209, 4, 25, 0.7)",
+        "rgba(18, 4, 209, 0.7)",
+        "rgba(166, 43, 158, 0.7)",
+        "rgba(255, 206, 86, 0.7)",
+        
+      ],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    legend: {
+        display: true,
+        position: 'right',
+        labels: {
+          fontColor: 'black',
+          fontSize: 12,
+          padding: 10
+        }
+  }}
+});
+
 
 
 
