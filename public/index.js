@@ -15,22 +15,36 @@ function getColor(stock) {
   }
 }
 
-
 const timeChartCanvas = document.querySelector("#time-chart");
-  const highestPriceChartCanvas = document.querySelector(
-    "#highest-price-chart"
-  );
-  const averagePriceChartCanvas = document.querySelector(
-    "#average-price-chart"
-  );
+const highestPriceChartCanvas = document.querySelector("#highest-price-chart");
+const averagePriceChartCanvas = document.querySelector("#average-price-chart");
 
 async function main() {
+  //   const response = await fetch(
+  //     `https://api.twelvedata.com/time_series?symbol=GME,MSFT,DIS,BNTX&interval=1min&apikey=c7130ed91f4c494eb0fe1e05335b8969`
+  //   );
+  //   const data = await response.json();
+  // const { GME, MSFT, DIS, BNTX} = mockData;
 
-//   const response = await fetch(
-//     `https://api.twelvedata.com/time_series?symbol=GME,MSFT,DIS,BNTX&interval=1min&apikey=c7130ed91f4c494eb0fe1e05335b8969`
-//   );
-//   const data = await response.json();
-// const { GME, MSFT, DIS, BNTX} = mockData;
+  function getHighest(mockData) {
+    const stocks = Object.keys(mockData);
+    const highestHighs = [];
+
+    stocks.forEach((stock) => {
+      const highestHigh = mockData[stock].values.reduce(
+        (maxHigh, currentValue) => {
+          return currentValue.high > maxHigh ? currentValue.high : maxHigh;
+        },
+        -Infinity
+      );
+
+      highestHighs.push(highestHigh);
+    });
+
+    return highestHighs;
+  }
+  const highestHighsArray = getHighest(mockData);
+  console.log(highestHighsArray);
 
   let GME = mockData.GME;
   let MSFT = mockData.MSFT;
@@ -39,7 +53,7 @@ async function main() {
 
   const stocks = [GME, MSFT, DIS, BNTX];
   stocks.forEach((stock) => stock.values.reverse());
-  
+
   new Chart(timeChartCanvas.getContext("2d"), {
     type: "line",
     data: {
@@ -51,34 +65,43 @@ async function main() {
         borderColor: getColor(stock.meta.symbol),
       })),
     },
-  })
-  function getHighest(stock) {
-    let highestPrice = Number.MIN_VALUE;
-    for (let i = 0; i < stock.values.length; I++) {
-        if(stock[i].values.high > highestPrice) {
-            highestPrice = stock[i].value.high;
-        }
-    }
-    return highestPrice;
-  }
+  });
 
-  console.log(getHighest(MSFT))
+
   new Chart(highestPriceChartCanvas.getContext("2d"), {
     type: "bar",
     data: {
-      labels: stocks.map((stock) => stock.meta.symbol),
-      datasets: stocks.map((stock) => ({
-        label: stock.meta.symbol,
-        data: stock.values.map((value) => parseFloat(value.high)),
-        backgroundColor: getColor(stock.meta.symbol),
-        borderColor: getColor(stock.meta.symbol)
-      })),
+      labels: ["GME", "MSFT", "DIS", "BNTX"],
+      datasets: [
+        {
+          label: "Highest Prices",
+          data: highestHighsArray,
+          backgroundColor: [
+            "rgba(61, 161, 61, 0.7)",
+            "rgba(209, 4, 25, 0.7)",
+            "rgba(18, 4, 209, 0.7)",
+            "rgba(166, 43, 158, 0.7)"
+          ],
+          borderColor: [
+            "rgba(61, 161, 61, 0.7)",
+            "rgba(209, 4, 25, 0.7)",
+            "rgba(18, 4, 209, 0.7)",
+            "rgba(166, 43, 158, 0.7)"
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
     },
   });
+}
 
-  console.log(stocks[0].values);
-  
-};
+
 
 main();
 
